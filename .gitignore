@@ -1,0 +1,16 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+dev1.py
+chromedriver
+src/__pycache__
+src/parse_longchain_llm.py
+#
+data/*
+data_estimated/*
+# Virtual environments
+.venv
