@@ -7,54 +7,62 @@ from src.parse_ollama import MyOllamaChat
 crawl_enbaled = False
 scrape = WebScraper()
 df_persist = DataFramePersist(directory='data')
+ollama_chat = MyOllamaChat(model='llama3.2')
 
 
 def main():
 
     st.title('related jobs')
-    url = st.text_input("add prompt")
-
-    col1 = st.columns(1)
+    prompt = st.text_area("add a custom prompt", height=100)
 
     # radio button
     websites = st.radio(
         "select websites",
         ["all", "indeed", "linkedin", "stepstone"],
-        index=0
+        index=1
 
     )
 
     # Step 1: Scrape the Website
     if st.button("Scrape Website"):
+        st.write("Scraping the website...")
+        # Scrape the website
+        if crawl_enbaled:
+            scrape.fetch_page()
+
         if websites == "all":
-            st.write("Scraping the website...")
-
-            # Scrape the website
-            if crawl_enbaled:
-                scrape.fetch_page()
-
             # load data
             df = df_persist.load_dataframes('all')
-            st.write(df['provider'].value_counts())
-            #
-            for index, row in df.iterrows():
-                st.text_area(f'job {index} provider {
-                             row['provider']}', row['title'], height=150)
-            # st.dataframe(items)
-
+        elif websites == "indeed":
+            df = df_persist.load_dataframes('indeed.csv')
+        elif websites == "linkedin":
+            df = df_persist.load_dataframes('linkedin.csv')
+        elif websites == "stepstone":
+            df = df_persist.load_dataframes('stepstone.csv')
         else:
             st.write('not selected!')
 
+        st.write(df['provider'].value_counts())
+        # pass to ollama
+        df = ollama_chat.add_related_percentage(df=df, custom_prompt=prompt)
+        #
+        for index, row in df.sort_values('percentage', ascending=False).iterrows():
+            st.text_area(f'job id: {index} provider: {
+                row['provider']} Ollama related estimate based on prompt: {row['percentage']}', row['title'], height=150)
+        # st.dataframe(items)
+
 
 if __name__ == "__main__":
-    # main()
+    main()
+
+    # Debugging:
     # scrape.fetch_page()
-    df = df_persist.load_dataframes('indeed.csv')
-    print(df['provider'].value_counts())
-    print(df.info())
-    # for index, row in df.iterrows():
-    #     print(row)
-    ollama_chat = MyOllamaChat(model='llama3.2')
-    ollama_chat.add_related_percentage(df=df)
-    df_persist_p = DataFramePersist(directory='data_estimated')
-    df_persist_p.save_dataframe(df, 'indeed_withP.csv')
+    # df = df_persist.load_dataframes('indeed.csv')
+    # print(df['provider'].value_counts())
+    # print(df.info())
+    # # for index, row in df.iterrows():
+    # #     print(row)
+    # ollama_chat = MyOllamaChat(model='llama3.2')
+    # ollama_chat.add_related_percentage(df=df)
+    # df_persist_p = DataFramePersist(directory='data_estimated')
+    # df_persist_p.save_dataframe(df, 'indeed_withP.csv')

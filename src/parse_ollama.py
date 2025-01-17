@@ -61,7 +61,12 @@ class MyOllamaChat:
             print(e)
             return 0
 
-    def add_related_percentage(self, df: pd.DataFrame) -> pd.DataFrame:
+    def add_related_percentage(self, df: pd.DataFrame, custom_prompt: str = None) -> pd.DataFrame:
+        # set custom prompt if provided
+        if custom_prompt:
+            self.prompt = custom_prompt
+            print(f'custom prompt: {self.prompt}')
+
         # df['percentage'] = [self.get_related_percentage(
         #     row['title']) for _, row in df.iterrows() if pd.notna(row['title']) else 0]
         df['percentage'] = df['title'].apply(
