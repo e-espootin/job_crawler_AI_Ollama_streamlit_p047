@@ -9,8 +9,13 @@ dev1.py
 chromedriver
 src/__pycache__
 src/parse_longchain_llm.py
+archive/*
+commands/*
 #
 data/*
 data_estimated/*
 # Virtual environments
 .venv
+.todo
+#
+src/__pycache__/*
