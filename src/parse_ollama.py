@@ -8,14 +8,17 @@ class MyOllamaChat:
     def __init__(self, model: str = 'llama3.2'):
         self.model = model
         self.prompt = """
-        act as senior data engineer
+        act and role play as senior data engineer
 
         skills:
-        - your skills are python, sql, spark, hadoop, etl, data modeling
+        - your skills are python, sql, spark, etl, Airflow, DBT, docker 
         - your experience is 7 years
 
         context:
         - you should check the given job title based on your experience and skills and in outcome estimate how much is this job title related to your skills and experience, output should be just a numeric value
+        - Jobs with english description should get higher percentage
+        - jobs with title as data engineer should get higher percentage
+        - if there is irrelevant job title, you should give 0 percentage 
 
         Expected Output: one percentage number
         """
@@ -67,8 +70,6 @@ class MyOllamaChat:
             self.prompt = custom_prompt
             print(f'custom prompt: {self.prompt}')
 
-        # df['percentage'] = [self.get_related_percentage(
-        #     row['title']) for _, row in df.iterrows() if pd.notna(row['title']) else 0]
         df['percentage'] = df['title'].apply(
             lambda x: self.get_related_percentage(x) if pd.notna(x) else 0)
         return df
