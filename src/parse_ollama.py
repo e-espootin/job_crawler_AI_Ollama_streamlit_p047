@@ -27,6 +27,7 @@ class MyOllamaChat:
         """
 
     def ask_question(self, question: str) -> str:
+        '''Ask a question to the model and return the response'''
         response: ChatResponse = chat(model=self.model, messages=[
             {
                 'role': 'user',
@@ -37,7 +38,9 @@ class MyOllamaChat:
         return response.message.content
 
     def get_related_percentage(self, job_title: str) -> int:
+        '''Get related percentage of job title based on the prompt'''
         try:
+            user_ask = f"this is posted job with title : {job_title} , how much is this job related to your skills and experience?"
             response: ChatResponse = chat(model=self.model, messages=[
                 {
                     'role': 'system',
@@ -49,7 +52,7 @@ class MyOllamaChat:
                 },
                 {
                     'role': 'user',
-                    'content': job_title,
+                    'content': user_ask,
                 },
             ])
             related_percentage = response.message.content
@@ -66,10 +69,9 @@ class MyOllamaChat:
 
     def add_related_percentage(self, df: pd.DataFrame, custom_prompt: str = None) -> pd.DataFrame:
         # set custom prompt if provided
-        if custom_prompt:
-            self.prompt = custom_prompt
-            print(f'custom prompt: {self.prompt}')
+        custom_prompt = {'role': 'system', 'content': custom_prompt} if custom_prompt else None
 
+        # add related percentage to the dataframe
         df['percentage'] = df['title'].apply(
             lambda x: self.get_related_percentage(x) if pd.notna(x) else 0)
         return df
